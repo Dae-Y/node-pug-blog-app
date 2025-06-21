@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1= post.title
+
+  - var author = post.createdBy && post.createdBy.username ? post.createdBy.username : 'Unknown'
+  p.text-muted By #{author} on #{post.createdAt.toDateString()}
+
+  .mb-3
+    - var formattedContent = post.content ? post.content.replace(/\n/g, '<br>') : ''
+    p!= formattedContent
+
+  if post.tags && post.tags.length
+    p.text-muted Tags: #{post.tags.join(', ')}
+  if user && post.createdBy && ((user._id.toString() === post.createdBy._id.toString()) || user.isAdmin)
+    a.btn.btn-warning(href=`/posts/${post._id}/edit`) Edit
+    form(action=`/posts/${post._id}`, method="POST", style="display:inline")
+      button.btn.btn-danger(type="submit" onclick="deletePost(event, this)") Delete

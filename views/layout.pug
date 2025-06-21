@@ -1,0 +1,72 @@
+doctype html
+html
+  head
+    title Blog App
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+
+  body
+    nav.navbar.navbar-expand-sm.mb-4(style="background-color: #add8e6;")
+      .container-fluid
+        a.navbar-brand(href='/') BlogApp
+        button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav')
+          span.navbar-toggler-icon
+        .collapse.navbar-collapse#navbarNav
+          ul.navbar-nav.me-auto.mb-2.mb-sm-0
+            if user
+              li.nav-item
+                span.nav-link #{user.username}
+              li.nav-item
+                a.nav-link(href='/posts') Posts
+              if user.isAdmin
+                li.nav-item
+                  a.nav-link(href='/users') View Users
+              li.nav-item
+                a.nav-link(href='/logout') Logout
+            else
+              li.nav-item
+                a.nav-link(href='/') Home
+              li.nav-item
+                a.nav-link(href='/posts') Posts
+              li.nav-item
+                a.nav-link(href='/login') Login
+              li.nav-item
+                a.nav-link(href='/register') Register
+
+    .container
+      if success && success.length
+        .alert.alert-success(role='alert')= success
+      if error && error.length
+        .alert.alert-danger(role='alert')= error
+
+      block content
+
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js')
+
+    //- JavaScript for handling DELETE requests
+    script.
+      function deletePost(event, button) {
+        event.preventDefault(); // Stop form from submitting normally
+
+        const postId = button.closest('form').getAttribute('action');
+
+        fetch(postId, {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert("Post deleted successfully!");
+            window.location.href = "/posts"; // Redirect back to posts after deletion
+          } else {
+            alert("Error deleting post.");
+          }
+        })
+        .catch(err => {
+          console.error("Delete error:", err);
+          alert("Error deleting post.");
+        });
+      }

@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h2 User List
+
+  if users.length
+    ul.list-group
+      each user in users
+        li.list-group-item= user.username
+  else
+    p No users found.

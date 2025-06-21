@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  h1 Blog Posts
+
+  //- Search bar for filtering posts by title or tag
+  form(class="d-flex mb-4", method="GET", action="/posts/search")
+    input.form-control.me-2(type="text", name="q", placeholder="Search by title or tag", value=search)
+    button.btn.btn-outline-success(type="submit") Search
+
+  //- Show "Create New Post" button for logged-in users
+  if user
+    a.btn.btn-success.mb-4(href="/posts/new") Create New Post
+
+  //- Posts list
+  if posts.length
+    each post in posts
+      .card.mb-3
+        .card-body
+          h5.card-title= post.title
+
+          //- Snippet of content (shows only first 150 characters)
+          if post.content && post.content.length > 150
+            p.card-text= post.content.substring(0, 150) + '...'
+          else
+            p.card-text= post.content || ''
+
+          //- Precompute display values for tags and author
+          - var tagList = (post.tags && post.tags.length) ? post.tags.join(', ') : 'No tags'
+          - var author = (post.createdBy && post.createdBy.username) ? post.createdBy.username : 'Unknown'
+
+          p.card-text.text-muted Tags: #{tagList} | By: #{author}
+
+          //- "Read More" link
+          a.btn.btn-primary.btn-sm(href=`/posts/${post._id}`) Read More
+
+          //- Show Edit/Delete buttons only to owner or admin
+          if user && post.createdBy && ((user._id.toString && user._id.toString() === post.createdBy._id.toString()) || user.isAdmin)
+            a.btn.btn-sm.btn-warning(href=`/posts/${post._id}/edit`) Edit
+            form(action=`/posts/${post._id}`, method="POST", style="display:inline")
+              button.btn.btn-sm.btn-danger(type="submit" onclick="deletePost(event, this)") Delete
+  else
+    p No posts found.

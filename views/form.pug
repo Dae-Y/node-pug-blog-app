@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h2= formTitle
+
+  form(method="POST", action= post && post._id ? `/posts/${post._id}/update` : "/posts")
+    .mb-3
+      label.form-label(for="title") Title
+      input.form-control(type="text", name="title", value=post && post.title ? post.title : '')
+
+    .mb-3
+      label.form-label(for="content") Content
+      textarea.form-control(name="content", rows="5")= post && post.content ? post.content : ''
+
+    .mb-3
+      label.form-label(for="tags") Tags (comma-separated)
+      - var tagList = (post && post.tags && post.tags.length) ? post.tags.join(', ') : ''
+      input.form-control(type="text", name="tags", value=tagList)
+
+    button.btn.btn-success(type="submit") Submit
